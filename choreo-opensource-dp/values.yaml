@@ -1,0 +1,70 @@
+# Default values for choreo-opensource-dp.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# cilium:
+#   namespaceOverride: "choreo-dp-cilium"
+#   aksbyocni:
+#     enabled: true
+#   encryption:
+#     enabled: true
+#     type: wireguard
+#   envoyConfig:
+#     enabled: true
+#   envoy:
+#     enabled: false
+#   cluster:
+#     name: choreo-dp-cluster
+#   priorityClassName: system-node-critical
+#   hubble:
+#     enabled: false
+#   ipam:
+#     operator:
+#       clusterPoolIPv4PodCIDRList: ["10.100.0.0/16"]
+#   operator:
+#     rollOutPods: true
+#     unmanagedPodWatcher:
+#       restart: true
+#     securityContext:
+#       seccompProfile:
+#         type: RuntimeDefault
+#       allowPrivilegeEscalation: false
+#       capabilities:
+#         drop:
+#           - ALL
+#     podDisruptionBudget:
+#       enabled: true
+#       minAvailable: "50%"
+#       maxUnavailable: ""
+#     priorityClassName: system-cluster-critical
+#   startupProbe:
+#     failureThreshold: 600
+#   policyEnforcementMode: default
+#   routingMode: tunnel
+#   kubeProxyReplacement: false
+#   rollOutCiliumPods: true
+#   extraConfig:
+#     http-retry-count: "0"
+
+vault:
+  dev:
+    enabled: true
+  server:
+   affinity: ""
+   ha:
+      enabled: true
+      raft: 
+         enabled: true
+         setNodeId: true
+         config: |
+            cluster_name = "vault-integrated-storage"
+            storage "raft" {
+               path    = "/vault/data/"
+            }
+
+            listener "tcp" {
+               address = "[::]:8200"
+               cluster_address = "[::]:8201"
+               tls_disable = "true"
+            }
+            service_registration "kubernetes" {}

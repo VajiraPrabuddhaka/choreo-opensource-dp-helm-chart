@@ -1,0 +1,68 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-world
+spec:
+  endpointSelector:
+    matchLabels:
+      user_app: 'true'
+  egress:
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-kube-dns
+spec:
+  endpointSelector:
+    matchLabels:
+      user_app: 'true'
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s-app: kube-dns
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: '53'
+              protocol: UDP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-internal-gateway
+spec:
+  endpointSelector:
+    matchLabels:
+      user_app: 'true'
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            choreo.component: internal-nginx
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-system-ingress
+spec:
+  endpointSelector:
+    matchLabels:
+      user_app: 'true'
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            userapp-ingress-allowed: 'true'
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-traffic-from-kubelet
+spec:
+  endpointSelector:
+    matchLabels:
+      user_app: 'true'
+  ingress:
+    - fromEntities:
+        - host
+        - remote-node
